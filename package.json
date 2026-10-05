@@ -1,0 +1,21 @@
+{
+  "name": "unison",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cả văn phòng nghe chung một bài YouTube/mp3, đồng bộ trên máy của từng người",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "start": "node server/index.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "nosleep.js": "^0.12.0",
+    "qrcode-generator": "^2.0.4",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "socket.io-client": "^4.8.1"
+  }
+}

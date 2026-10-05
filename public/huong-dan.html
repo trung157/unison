@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hướng dẫn {{APP_NAME}}</title>
+<link rel="icon" href="/icon-192.png">
+<style>
+  :root { --bg: #0f1115; --card: #181b22; --line: #2a2f3a; --text: #e8eaf0; --muted: #9aa0ad; --accent: #3ddc97; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  h2 { font-size: 17px; margin: 0 0 8px; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+  ul, ol { margin: 0; padding-left: 20px; }
+  li { margin: 3px 0; }
+  kbd { background: #23283a; border: 1px solid #39405a; border-bottom-width: 2px; border-radius: 5px; padding: 0 6px; font: 13px ui-monospace, monospace; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .grid .card { margin: 0; }
+  .muted { color: var(--muted); }
+  a { color: var(--accent); }
+  .back { display: inline-block; margin-bottom: 16px; }
+  table { border-collapse: collapse; width: 100%; }
+  td { padding: 4px 8px 4px 0; vertical-align: top; }
+  td:first-child { white-space: nowrap; }
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="/">← Về {{APP_NAME}}</a>
+  <h1>🎵 {{APP_NAME}} — hướng dẫn nhanh</h1>
+  <p class="sub">Cả văn phòng nghe chung một bài, mỗi người trên máy của mình. Ai cũng chọn bài được.</p>
+
+  <div class="card">
+    <h2>1. Vào phòng</h2>
+    <ol>
+      <li>Mở địa chỉ phòng mà quản trị viên gửi, hoặc quét <b>mã QR vào phòng</b> từ máy đồng nghiệp (có sẵn mã phòng).</li>
+      <li>Nhập mã phòng (hỏi quản trị viên), chọn ảnh đại diện, gõ tên, bấm <b>Vào nghe</b>. Lần sau máy tự nhớ.</li>
+      <li>Nếu thấy dòng <b>🔈 Chạm vào đây để nghe</b> thì chạm một lần — trình duyệt cần bạn bấm trước mới cho phát tiếng.</li>
+    </ol>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>🔎 Thêm bài</h2>
+      <ul>
+        <li>Gõ tên bài rồi <b>Tìm</b>, bấm <b>+</b> để thêm.</li>
+        <li>Dán link YouTube hoặc link playlist cũng được.</li>
+        <li>Muốn tặng ai thì gõ <b>💌 lời nhắn</b> trước khi thêm.</li>
+        <li><b>📁 Tải mp3</b> (≤ 20 MB) — bài mp3 nghe được cả khi tắt màn hình điện thoại.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>📋 Hàng chờ</h2>
+      <ul>
+        <li>Xếp <b>lượt xen kẽ</b>: mỗi người một bài mỗi lượt, không ai chiếm cả hàng.</li>
+        <li><b>👍</b> bài mình thích để nó lên trước trong lượt.</li>
+        <li><b>Bỏ qua</b> = bỏ phiếu; quá nửa phòng đồng ý là chuyển bài.</li>
+        <li><b>⏸ Tạm dừng</b> là dừng cả phòng (có ghi tên người bấm), 30 phút tự phát tiếp.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>💬 Chat & giao lưu</h2>
+      <ul>
+        <li>Gõ <b>@</b> để gọi tên đồng nghiệp; người đó được báo riêng.</li>
+        <li>Rê chuột lên tin để thả ❤️😂👍😮🎉.</li>
+        <li>Bấm <b>🔕 Báo tin chat</b> để nhận thông báo khi đang mở tab khác.</li>
+        <li>Thả cảm xúc bay trên màn hình ở hàng nút dưới trình phát.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>🎶 Playlist</h2>
+      <ul>
+        <li>Thẻ <b>Playlist</b>: đặt tên → <b>Lưu hàng chờ</b> thành playlist.</li>
+        <li><b>▶ Nạp vào hàng chờ</b> để phát lại cả danh sách.</li>
+        <li><b>+ bài đang phát</b> để bổ sung bài hay.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>🎤 Lời bài</h2>
+      <ul>
+        <li>Thẻ <b>Lời bài</b> hiện lời chạy theo nhạc (nếu có).</li>
+        <li>Lời lệch? Bấm <b>⏪ / ⏩</b> để chỉnh từng giây — máy bạn nhớ cho bài đó.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>🏆 Xếp hạng & huy hiệu</h2>
+      <ul>
+        <li>Thẻ <b>Xếp hạng</b>: người chọn bài hay nhất, bài được thích nhất tuần.</li>
+        <li>Chiều thứ Sáu có <b>📊 tổng kết tuần</b>.</li>
+        <li>Huy hiệu: 🏆 DJ của tuần · 🧭 Người khai phá · ❤️ Được yêu thích · 🔥 Chăm chỉ · 🎂 Sinh nhật.</li>
+        <li>Bấm <b>🎂 Sinh nhật</b> nhập ngày/tháng — tới ngày phòng tự chúc mừng.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <h2>💻 Mẹo trên máy tính</h2>
+    <table>
+      <tr><td><kbd>Space</kbd></td><td>tạm dừng / phát tiếp cả phòng</td></tr>
+      <tr><td><kbd>M</kbd></td><td>tắt / bật tiếng máy mình (không ảnh hưởng người khác)</td></tr>
+      <tr><td><kbd>L</kbd></td><td>thả ❤️</td></tr>
+      <tr><td><kbd>N</kbd></td><td>bỏ phiếu bỏ qua</td></tr>
+      <tr><td><kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>K</kbd></td><td>nhảy vào ô tìm bài</td></tr>
+      <tr><td>⏯ trên bàn phím</td><td>dừng / phát cả phòng</td></tr>
+      <tr><td>🪟 Cửa sổ nổi</td><td>khung nhỏ luôn nằm trên các cửa sổ khác (Chrome/Edge)</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>📱 Trên điện thoại</h2>
+    <ul>
+      <li>Bấm <b>📲 Cài app</b> (Android) hoặc Chia sẻ → <b>Thêm vào MH chính</b> (iPhone) để mở như app.</li>
+      <li>Bài YouTube sẽ dừng khi khoá màn hình. Bài <b>mp3</b> thì nghe được cả khi tắt màn hình, và có <b>🌙 màn hình tối</b> để đỡ hao pin.</li>
+      <li>Âm lượng thanh trượt chỉ chỉnh máy của bạn.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>🙋 Gặp lỗi?</h2>
+    <ul>
+      <li><b>Không có tiếng:</b> chạm vào trang một lần, kiểm tra nút 🔊 và âm lượng máy.</li>
+      <li><b>"Video này không hoạt động":</b> mở phòng bằng <b>tên miền</b>, không mở bằng số IP.</li>
+      <li><b>Lệch vài giây với người khác:</b> bình thường, máy tự canh lại sau ít giây (hay gặp khi có quảng cáo YouTube).</li>
+      <li><b>Giờ nghỉ trưa / ngoài giờ làm</b> phòng tự im lặng — vào giờ là tự phát tiếp.</li>
+      <li>Vẫn không được? Nhắn quản trị viên.</li>
+    </ul>
+  </div>
+  <p class="muted">Lời bài từ kho cộng đồng LRCLIB, chỉ dùng trong phòng. Ai tải mp3 lên tự chịu trách nhiệm bản quyền.</p>
+</main>
+</body>
+</html>

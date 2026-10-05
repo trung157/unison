@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{APP_NAME}}</title>
+<meta name="theme-color" content="#0f1115">
+<meta name="app-name" content="{{APP_NAME}}">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="{{APP_NAME}}">
+<link rel="stylesheet" href="style.css?v=14">
+</head>
+<body>
+<div id="offline" class="banner" hidden>Đang kết nối lại…</div>
+
+<section id="join" class="join">
+  <h1>🎵 {{APP_NAME}}</h1>
+  <p class="muted">Cùng nghe chung một bài với cả văn phòng.</p>
+  <form id="join-form">
+    <div id="code-row" class="code-row" hidden>
+      <input id="code" inputmode="numeric" autocomplete="off" maxlength="20" placeholder="Mã phòng">
+    </div>
+    <div id="avatars" class="avatars" aria-label="Chọn ảnh đại diện"></div>
+    <input id="name" maxlength="24" placeholder="Tên của anh/chị" autocomplete="nickname" required>
+    <button type="submit">Vào nghe</button>
+  </form>
+  <p id="join-now" class="muted small"></p>
+</section>
+
+<main>
+  <div class="col">
+    <section class="card now">
+      <div id="theme-bar" class="theme-bar" hidden></div>
+      <div id="player-wrap" class="player-wrap empty" data-label="Phòng đang im lặng">
+        <div id="player"></div>
+      </div>
+      <audio id="audio" preload="auto"></audio>
+      <div id="tap-play" class="banner warn" hidden>🔈 Chạm vào đây để nghe</div>
+      <div id="paused-bar" class="banner" hidden></div>
+      <div id="blocked-bar" class="banner warn" hidden></div>
+      <h2 id="now-title">Chưa có bài nào — tìm và thêm bài ở ô "Thêm bài"</h2>
+      <p id="now-meta" class="muted small"></p>
+      <p id="now-note" class="note" hidden></p>
+      <div id="next-up" class="next-up" hidden></div>
+      <div class="progress"><div id="progress-fill"></div></div>
+      <p id="now-time" class="muted small time"></p>
+      <div class="controls">
+        <button id="btn-pause" type="button">⏸ Tạm dừng</button>
+        <button id="btn-mute" type="button" title="Tắt/bật tiếng máy mình">🔊</button>
+        <input id="volume" type="range" min="0" max="100" aria-label="Âm lượng máy mình">
+        <button id="btn-skip" type="button">Bỏ qua</button>
+        <button id="btn-dim" type="button" title="Màn hình tối — giữ nhạc chạy, đỡ hao pin">🌙</button>
+        <button id="btn-pip" type="button" title="Cửa sổ nhạc nổi — luôn nằm trên các cửa sổ khác" hidden>🪟 Cửa sổ nổi</button>
+      </div>
+      <div id="reactions" class="reactions"></div>
+      <div id="poll" class="poll" hidden></div>
+      <p id="quiet-info" class="muted small"></p>
+    </section>
+
+
+  </div>
+
+  <div class="col">
+    <section class="card add-card">
+      <div class="card-head">
+        <h3>🔎 Thêm bài</h3>
+        <span class="muted small">Ctrl/⌘ + K</span>
+      </div>
+      <form id="search-form" class="search">
+        <input id="q" placeholder="Tên bài, ca sĩ, link YouTube hoặc link playlist" maxlength="300" enterkeyhint="search">
+        <button type="submit" class="primary-btn">Tìm</button>
+      </form>
+      <div id="results-box" class="results-box" hidden>
+        <div class="results-head">
+          <span id="results-info" class="small"></span>
+          <button id="btn-clear-results" type="button" class="link">✕ Đóng</button>
+        </div>
+        <label class="note-row">
+          <span>💌</span>
+          <input id="note" class="note-input" maxlength="100" placeholder="Lời nhắn kèm bài (tuỳ chọn), vd: Tặng team kế toán">
+        </label>
+        <button id="btn-add-all" type="button" class="primary" hidden></button>
+        <ul id="results" class="list results"></ul>
+      </div>
+      <div class="upload-row">
+        <label class="upload-btn">📁 Tải mp3 lên<input id="file" type="file" accept=".mp3,audio/mpeg" hidden></label>
+        <span class="muted small">≤ 20 MB · nghe được cả khi tắt màn hình · người tải tự chịu trách nhiệm bản quyền</span>
+      </div>
+    </section>
+    <section class="card">
+      <nav class="tabs" role="tablist">
+        <button type="button" data-tab="queue" class="active">Hàng chờ</button>
+        <button type="button" data-tab="history">Lịch sử</button>
+        <button type="button" data-tab="chat">Chat <span id="chat-badge" class="badge" hidden></span></button>
+        <button type="button" data-tab="playlists">Playlist</button>
+        <button type="button" data-tab="top">Xếp hạng</button>
+        <button type="button" data-tab="lyrics">Lời bài</button>
+      </nav>
+      <div data-panel="queue">
+        <ul id="queue" class="list"></ul>
+        <p id="queue-empty" class="muted small">Hàng chờ trống.</p>
+      </div>
+      <div data-panel="history" hidden>
+        <ul id="history" class="list"></ul>
+      </div>
+      <div data-panel="chat" hidden>
+        <ul id="chat" class="chat"></ul>
+        <div id="mention" class="mention" hidden></div>
+        <form id="chat-form" class="search">
+          <input id="chat-text" maxlength="300" placeholder="Nhắn cả phòng…" autocomplete="off" enterkeyhint="send">
+          <button type="submit">Gửi</button>
+        </form>
+      </div>
+      <div data-panel="playlists" hidden>
+        <form id="pl-form" class="search">
+          <input id="pl-name" maxlength="60" placeholder="Tên playlist, vd: Lofi tập trung" required>
+          <button type="submit">💾 Lưu hàng chờ</button>
+        </form>
+        <p class="muted small">Lưu bài đang phát + hàng chờ thành playlist (trùng tên của mình thì ghi đè). Nghe bài hay thì bấm "+ bài đang phát" để bổ sung.</p>
+        <ul id="playlists" class="list"></ul>
+      </div>
+      <div data-panel="top" hidden>
+        <div class="top-head">
+          <div><div class="top-title">🏆 Bảng xếp hạng</div><div id="top-week" class="muted small"></div></div>
+          <button id="btn-wrap" type="button">📊 Tổng kết tuần</button>
+        </div>
+        <div id="top-me" class="me-card"></div>
+        <h4 class="top-h">🌟 Người chọn bài hay nhất</h4>
+        <div id="top-podium" class="podium"></div>
+        <ol id="top-people" class="rank-list"></ol>
+        <h4 class="top-h">🎵 Bài được thích nhất</h4>
+        <ol id="top-tracks" class="rank-list"></ol>
+      </div>
+      <div data-panel="lyrics" hidden>
+        <div class="lyrics-tools">
+          <span class="muted small">Lời lệch nhạc?</span>
+          <button id="lyrics-earlier" type="button" title="Lời đang chậm hơn nhạc">⏪ Lời nhanh lên 1s</button>
+          <span id="lyrics-shift" class="small">0s</span>
+          <button id="lyrics-later" type="button" title="Lời đang chạy trước nhạc">Lời chậm lại 1s ⏩</button>
+        </div>
+        <div id="lyrics" class="lyrics"></div>
+        <p class="muted small">Lời từ kho cộng đồng LRCLIB, chỉ dùng trong phòng.</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <details>
+        <summary id="listeners-sum">Đang nghe: 0 người</summary>
+        <ul id="listeners" class="names"></ul>
+      </details>
+      <div class="links">
+        <button id="btn-rename" type="button" class="link">Đổi tên</button>
+        <button id="btn-bday" type="button" class="link">🎂 Sinh nhật</button>
+        <button id="btn-badges" type="button" class="link">🏅 Huy hiệu</button>
+        <button id="btn-notify" type="button" class="link"></button>
+        <button id="btn-admin" type="button" class="link">👑 Chủ phòng</button>
+        <button id="btn-install" type="button" class="link" hidden>📲 Cài app</button>
+        <button id="btn-qr" type="button" class="link">📱 Mã QR vào phòng</button>
+        <button id="btn-keys" type="button" class="link">⌨️ Phím tắt</button>
+        <a href="/huong-dan.html" target="_blank" class="link">❓ Hướng dẫn</a>
+      </div>
+      <p id="ios-hint" class="muted small" hidden>iPhone: bấm Chia sẻ → "Thêm vào MH chính" để cài như app.</p>
+    </section>
+  </div>
+    <section id="admin-bar" class="card admin-panel" hidden>
+      <div class="ap-head">
+        <div>
+          <div class="ap-title">👑 Bảng chủ phòng</div>
+          <div class="muted small">Chỉ máy đã nhập mã chủ phòng mới thấy khung này.</div>
+        </div>
+        <button id="btn-admin-out" type="button" class="link">Thoát chủ phòng</button>
+      </div>
+
+      <div class="ap-quick">
+        <button id="btn-force-skip" type="button" class="ap-big"><span>⏭</span><b>Chuyển ngay</b><small>bỏ qua không cần bỏ phiếu</small></button>
+        <button id="btn-lock" type="button" class="ap-big"><span>🔒</span><b>Khoá thêm bài</b><small>chỉ chủ phòng thêm được</small></button>
+        <button id="btn-autofill" type="button" class="ap-big"><span>🔁</span><b>Tự phát</b><small>khi hàng chờ trống</small></button>
+        <label class="ap-big ap-select"><span>🎶</span><b>Nguồn tự phát</b><select id="fill-src"><option value="">Lịch sử (bài hay)</option></select></label>
+      </div>
+
+      <nav class="ap-tabs" role="tablist">
+        <button type="button" data-ap="vibe" class="active">🎉 Không khí</button>
+        <button type="button" data-ap="sched">⏰ Hẹn giờ</button>
+        <button type="button" data-ap="people">👥 Thành viên</button>
+        <button type="button" data-ap="system">⚙️ Hệ thống</button>
+      </nav>
+
+      <div data-ap-panel="vibe" class="ap-grid">
+        <form id="theme-form" class="ap-card">
+          <h5>🎯 Chủ đề hôm nay</h5>
+          <p class="muted small">Hiện trên đầu trang mọi người. Để trống rồi lưu là xoá.</p>
+          <input id="theme-text" maxlength="80" placeholder="vd: Thứ 6 sôi động 🔥">
+          <button type="submit">Đặt chủ đề</button>
+        </form>
+        <form id="celebrate-form" class="ap-card">
+          <h5>🎉 Chúc mừng</h5>
+          <p class="muted small">Pháo hoa + lời chúc trên mọi máy. Có link thì phát ngay bài đó.</p>
+          <input id="celebrate-text" maxlength="120" placeholder="vd: Chúc mừng team Sale chốt hợp đồng 🎊" required>
+          <input id="celebrate-link" placeholder="Link YouTube (tuỳ chọn)">
+          <button type="submit">🎉 Bắn pháo hoa</button>
+        </form>
+        <form id="poll-form" class="ap-card">
+          <h5>🗳 Bình chọn</h5>
+          <p class="muted small">Mở bình chọn mới sẽ thay bình chọn đang có.</p>
+          <input id="poll-q" maxlength="100" placeholder="vd: Chiều nay nghe gì?" required>
+          <input id="poll-opts" placeholder="Lựa chọn, cách nhau dấu phẩy: Ballad, EDM, Lofi" required>
+          <button type="submit">Mở bình chọn</button>
+        </form>
+      </div>
+
+      <div data-ap-panel="sched" class="ap-grid" hidden>
+        <form id="sched-form" class="ap-card sched-form">
+          <h5>⏰ Hẹn giờ phát</h5>
+          <p class="muted small">Tới giờ là phát ngay (bài đang phát bị thay). Mỗi ngày chạy một lần.</p>
+          <div class="ap-row">
+            <input id="sched-time" type="time" required title="Giờ phát">
+            <input id="sched-label" maxlength="60" placeholder="Nhãn, vd: Giãn cơ">
+          </div>
+          <div class="ap-row">
+            <select id="sched-pl" title="Phát gì"><option value="">Phát 1 bài (dán link) →</option></select>
+            <input id="sched-link" placeholder="Link YouTube">
+          </div>
+          <div id="sched-days" class="days"></div>
+          <button type="submit">Thêm lịch</button>
+        </form>
+        <div class="ap-card">
+          <h5>📅 Lịch đang có</h5>
+          <ul id="sched-list" class="sched-list"></ul>
+          <p id="sched-empty" class="muted small">Chưa có lịch nào.</p>
+        </div>
+        <form id="bday-song-form" class="ap-card">
+          <h5>🎂 Bài chúc sinh nhật</h5>
+          <p id="bday-song-now" class="muted small"></p>
+          <input id="bday-song" placeholder="Link YouTube — để trống rồi lưu = chỉ chúc, không phát bài">
+          <button type="submit">Lưu bài sinh nhật</button>
+        </form>
+      </div>
+
+      <div data-ap-panel="people" class="ap-grid" hidden>
+        <div class="ap-card">
+          <h5>👥 Đang nghe</h5>
+          <p class="muted small">Chặn 1 giờ: không thêm bài, chat, bỏ phiếu được; bài đang chờ của họ bị xoá. Xoá tin chat: rê chuột lên tin → 🗑.</p>
+          <ul id="ap-people" class="ap-people"></ul>
+        </div>
+        <div class="ap-card">
+          <h5>🚫 Đang chặn</h5>
+          <div id="blocked-list"></div>
+          <p id="blocked-empty" class="muted small">Không chặn ai.</p>
+        </div>
+      </div>
+
+      <div data-ap-panel="system" class="ap-grid" hidden>
+        <div id="status-box" class="ap-card status-box">
+          <div class="status-head"><h5>📊 Tình trạng phòng</h5><button id="btn-status" type="button" class="link">Làm mới</button></div>
+          <div id="status-body" class="status-body"></div>
+        </div>
+        <form id="quiet-form" class="ap-card quiet-form">
+          <h5>🌙 Giờ yên lặng</h5>
+          <label><input id="quiet-on" type="checkbox"> Chỉ phát trong khung giờ dưới đây</label>
+          <div id="quiet-days" class="days"></div>
+          <input id="quiet-ranges" placeholder="08:00-12:00, 13:00-17:30">
+          <button type="submit">Lưu giờ yên lặng</button>
+        </form>
+      </div>
+    </section>
+</main>
+
+<div id="fx" class="fx" aria-hidden="true"></div>
+<div id="celebrate" class="celebrate" hidden></div>
+<div id="wrap" class="celebrate wrap" hidden></div>
+<div id="qr" class="celebrate qr" hidden></div>
+
+<div id="dim" class="dim" hidden>
+  <div id="dim-clock" class="dim-clock"></div>
+  <div id="dim-title" class="dim-title"></div>
+  <div class="dim-hint">Chạm 2 lần để thoát · đừng bấm nút nguồn</div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/vendor/NoSleep.min.js"></script>
+<script src="/vendor/qrcode.js"></script>
+<script src="app.js?v=14"></script>
+<script src="https://www.youtube.com/iframe_api"></script>
+</body>
+</html>
