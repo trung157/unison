@@ -61,6 +61,7 @@ const app = createApp({
   roomCode: process.env.ROOM_CODE ?? '',
   adminCode: process.env.ADMIN_CODE ?? '',
   appName: process.env.APP_NAME || 'Unison',
+  trustProxy: process.env.TRUST_PROXY ?? '',
 });
 await app.listen(PORT, '0.0.0.0');
 

@@ -8,6 +8,7 @@ import { Server } from 'socket.io';
 import { parseVideoId, parsePlaylistId } from './youtube.js';
 import { isOpen, QUIET_NAME } from './quiet.js';
 import { CHAT_REACTS } from './room.js';
+import { createGuard, clientIp } from './guard.js';
 
 // Việc bị cấm khi đang bị chủ phòng chặn tạm.
 const BLOCKABLE = new Set(['addTrack', 'chat', 'react', 'chatReact', 'playlistLoad', 'playlistSaveQueue', 'playlistAddCurrent', 'skip', 'pause', 'resume']);
@@ -61,6 +62,7 @@ export function messages(cfg) {
     bad_poll: 'Cần câu hỏi và 2–6 lựa chọn',
     no_poll: 'Bình chọn đã kết thúc',
     bad_birthday: 'Ngày sinh không hợp lệ (ngày/tháng)',
+    too_many_tries: 'Thử sai nhiều lần quá — đợi 15 phút rồi thử lại',
     blocked: 'Chủ phòng đang tạm chặn bạn thêm bài / chat — thử lại sau',
     server: 'Lỗi máy chủ, thử lại sau',
   };
@@ -68,11 +70,16 @@ export function messages(cfg) {
 
 export function createApp({
   room, yt, store, library = null, lyrics = null, roomCode = '', adminCode = '', appName = 'Unison',
-  now = Date.now, log = console, backup = null,
+  now = Date.now, log = console, backup = null, trustProxy = '', guard = createGuard({ now }),
 }) {
   const startedAt = now();
   const app = express();
   // no-cache: Cloudflare và trình duyệt luôn hỏi lại, để giao diện mới tới tay mọi người ngay sau khi sửa.
+  app.disable('x-powered-by');
+  app.use((req, res, next) => {
+    res.set({ 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'same-origin', 'X-Frame-Options': 'SAMEORIGIN' });
+    next();
+  });
   // Trang có tên app: chèn APP_NAME (thoát ký tự HTML) trước khi gửi.
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const named = (file, type) => (req, res) => {
@@ -167,10 +174,25 @@ export function createApp({
   quietTimer = setInterval(() => { const a = runDue(); if (enforceQuiet() || a) changed(); }, QUIET_CHECK_MS);
 
   // Có mã phòng thì chỉ cho kết nối khi gửi đúng mã.
+  // Mã phòng + mã chủ phòng: sai 5 lần / 10 phút thì khoá thử 15 phút theo IP.
   const codeOk = code => !roomCode || code === roomCode;
+  const ipOfSocket = s => clientIp({ headers: s.handshake.headers, address: s.handshake.address }, trustProxy);
+  const ipOfReq = r => clientIp({ headers: r.headers, address: r.socket.remoteAddress }, trustProxy);
+  // Kiểm mã có chống dò: trả 'ok' | 'bad' | 'locked'.
+  const tryCode = (kind, ip, good) => {
+    const key = `${kind}:${ip}`;
+    if (guard.lockedFor(key)) return 'locked';
+    if (good) { guard.ok(key); return 'ok'; }
+    guard.fail(key);
+    return guard.lockedFor(key) ? 'locked' : 'bad';
+  };
+  const sweepTimer = setInterval(() => guard.sweep(), 10 * 60_000);
+  sweepTimer.unref?.();
   io.use((socket, next) => {
-    if (codeOk(socket.handshake.auth?.code)) return next();
-    next(new Error('bad_code'));
+    if (!roomCode) return next();
+    const r = tryCode('room', ipOfSocket(socket), codeOk(socket.handshake.auth?.code));
+    if (r === 'ok') return next();
+    next(new Error(r === 'locked' ? 'too_many_tries' : 'bad_code'));
   });
 
   // Tải mp3: thân yêu cầu là nguyên tệp; mã phòng, người tải, tên bài, thời lượng nằm trong header.
@@ -178,7 +200,10 @@ export function createApp({
     const send = (code, extra = {}) => res.json(code ? fail(code) : { ok: true, ...extra });
     try {
       if (!library) return send('server');
-      if (!codeOk(req.get('x-room-code') ?? '')) return res.status(403).json(fail('not_joined'));
+      if (roomCode) {
+        const r = tryCode('room', ipOfReq(req), codeOk(req.get('x-room-code') ?? ''));
+        if (r !== 'ok') return res.status(r === 'locked' ? 429 : 403).json(fail(r === 'locked' ? 'too_many_tries' : 'not_joined'));
+      }
       const userId = req.get('x-user-id') ?? '';
       const listener = room.listeners.get(userId);
       if (!listener) return send('not_joined');
@@ -256,7 +281,9 @@ export function createApp({
     }, { needJoin: false });
 
     on('admin', ({ code }) => {
-      if (!adminCode || code !== adminCode) return fail('bad_admin');
+      if (!adminCode) return fail('bad_admin');
+      const r = tryCode('admin', ipOfSocket(socket), typeof code === 'string' && code === adminCode);
+      if (r !== 'ok') return fail(r === 'locked' ? 'too_many_tries' : 'bad_admin');
       socket.data.admin = true;
       broadcast();
       return { ok: true };
@@ -426,6 +453,7 @@ export function createApp({
       closed = true;
       clearTimeout(timer);
       clearInterval(quietTimer);
+      clearInterval(sweepTimer);
       store.flush();
       return new Promise(resolve => io.close(() => { clearTimeout(timer); store.flush(); resolve(); }));
     },

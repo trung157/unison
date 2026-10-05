@@ -205,3 +205,33 @@ test('tặng bài, chủ đề, chúc mừng phát ngay, thống kê cá nhân',
     assert.equal(lb.me.week.plays >= 1, true);
   } finally { await close(); }
 });
+
+test('chống dò mã chủ phòng: sai 5 lần thì khoá, nhập đúng cũng bị từ chối', async () => {
+  const { client, close } = await setup();
+  try {
+    const a = client();
+    await emit(a, 'join', { userId: 'user-aaaa', name: 'An' });
+    for (let i = 0; i < 4; i++) assert.match((await emit(a, 'admin', { code: 'sai' })).error, /không đúng/);
+    assert.match((await emit(a, 'admin', { code: 'sai' })).error, /nhiều lần/);
+    assert.match((await emit(a, 'admin', { code: 'boss99' })).error, /nhiều lần/);
+  } finally { await close(); }
+});
+
+test('chống dò mã phòng: sai 5 lần thì kết nối đúng mã cũng bị chặn', async () => {
+  const { client, close } = await setup('1234');
+  try {
+    const errOf = c => new Promise(r => { c.on('connect_error', e => r(e.message)); c.on('connect', () => r('connected')); });
+    for (let i = 0; i < 4; i++) assert.equal(await errOf(client('0000')), 'bad_code');
+    assert.equal(await errOf(client('0000')), 'too_many_tries');
+    assert.equal(await errOf(client('1234')), 'too_many_tries');
+  } finally { await close(); }
+});
+
+test('header bảo mật có trên trang chủ', async () => {
+  const { close, port } = await setup();
+  try {
+    const r = await fetch(`http://127.0.0.1:${port}/`);
+    assert.equal(r.headers.get('x-content-type-options'), 'nosniff');
+    assert.equal(r.headers.get('x-powered-by'), null);
+  } finally { await close(); }
+});

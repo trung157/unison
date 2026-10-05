@@ -79,6 +79,7 @@ Hạn mức miễn phí là 10.000 đơn vị mỗi ngày, tức khoảng 99 l�
 | `MAX_PER_USER` | 5 | số bài đang chờ tối đa mỗi người |
 | `AUTO_RESUME_MIN` | 30 | tạm dừng quá chừng này phút thì tự phát tiếp |
 | `BACKUP_DIR` | `./backups` | nơi sao lưu hằng ngày (giữ 14 ngày) |
+| `TRUST_PROXY` | (trống) | đứng sau proxy thì đặt `cloudflare` (Cloudflare Tunnel) hoặc `proxy` (nginx, Caddy…) để chống dò mã theo đúng IP người dùng; **để trống nếu không có proxy** — header proxy giả được |
 
 ## Dữ liệu
 
@@ -106,6 +107,15 @@ npm test
 | `public/` | Giao diện: HTML/JS/CSS thuần, không có bước build |
 
 Khi đưa lên sau CDN, mỗi lần sửa giao diện nhớ tăng số `?v=` trong `public/index.html`.
+
+## 🔒 Bảo mật
+
+- **Chống dò mã:** sai mã phòng hoặc mã chủ phòng 5 lần trong 10 phút thì địa chỉ IP đó bị khoá thử 15 phút. Chạy sau Cloudflare Tunnel hay nginx thì nhớ đặt `TRUST_PROXY`, nếu không mọi người dùng sẽ bị tính chung một IP.
+- **Mã:** dùng chuỗi dài, khoảng 8–10 ký tự có cả chữ và số, đặc biệt khi mở phòng ra Internet.
+- **Danh tính dựa trên tin tưởng:** không có mật khẩu người dùng, ai cũng tự đặt tên. Người bị chủ phòng chặn có thể xoá dữ liệu trình duyệt để vào lại. Unison dành cho nhóm quen biết, không dành cho phòng công cộng.
+- **Mã QR "vào phòng" có chứa sẵn mã phòng.** Ai cầm ảnh QR là vào được, nên chỉ chia sẻ trong nhóm.
+- **API key YouTube** chỉ nằm trên máy chủ, không gửi xuống trình duyệt.
+- Phát hiện lỗ hổng? Báo riêng cho người duy trì repo, đừng mở issue công khai.
 
 ## ⚖️ Lưu ý pháp lý (đọc trước khi dùng)
 

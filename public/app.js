@@ -136,6 +136,13 @@ socket.on('connect', async () => {
 socket.on('disconnect', () => { $('offline').hidden = false; });
 // Sai/thiếu mã phòng: máy chủ từ chối kết nối — hiện ô nhập mã, không tự thử lại.
 socket.on('connect_error', err => {
+  if (err.message === 'too_many_tries') {
+    $('offline').hidden = true;
+    $('code-row').hidden = false;
+    $('join').hidden = false;
+    toast('Thử sai mã nhiều lần quá — đợi 15 phút rồi thử lại');
+    return;
+  }
   if (err.message !== 'bad_code') return;
   $('offline').hidden = true;
   $('code-row').hidden = false;
