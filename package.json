@@ -1,9 +1,9 @@
-{
+﻿{
   "name": "unison",
   "version": "1.0.0",
   "private": true,
-  "description": "Cả văn phòng nghe chung một bài YouTube/mp3, đồng bộ trên máy của từng người",
-  "license": "MIT",
+  "description": "Cáº£ vÄƒn phÃ²ng nghe chung má»™t bÃ i YouTube/mp3, Ä‘á»“ng bá»™ trÃªn mÃ¡y cá»§a tá»«ng ngÆ°á»i",
+  "license": "MIT",`n  "author": "trungpv75",
   "type": "module",
   "scripts": {
     "start": "node server/index.js",
